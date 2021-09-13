@@ -42,9 +42,9 @@ print(port.available() + ' bytes received');
 ### Reading data
 
 ```
-let in = port.read();
-if (in.length > 0) {
-	print('Received: ' + in);
+let input = port.read();
+if (input.length > 0) {
+	print('Received: ' + input);
 }
 ```
 
@@ -54,9 +54,9 @@ read returns the received data as a string. This function returns an empty strin
 ### Reading data up to a special character
 
 ```
-let in = port.readUntil("\n");
-if (in.length > 0) {
-	print('Received: ' + in.trim());
+let input = port.readUntil("\n");
+if (input.length > 0) {
+	print('Received: ' + input.trim());
 }
 ```
 

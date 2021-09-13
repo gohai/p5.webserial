@@ -2,9 +2,9 @@
 
 A library for p5.js which adds support for interacting with Serial devices, using the Web Serial API (currently supported on Chrome and Edge).
 
-Download the library file [here]() or simply embed this script tag:
+Download the library file [here](https://github.com/gohai/p5.webserial/blob/main/libraries/p5.webserial.js) or simply embed this script tag:
 ```
-<script src="https://raw.githubusercontent.com/gohai/p5.webserial.js/master/libraries/p5.webserial.js"></script>
+<script src="https://raw.githubusercontent.com/gohai/p5.webserial/main/libraries/p5.webserial.js"></script>
 ```
 
 

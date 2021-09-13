@@ -29,7 +29,7 @@ If the first argument is the string "Arduino" or "MicroPython", the dialog will 
 port.write('Hello from the computer');
 ```
 
-If the port is not yet available, you'll a notification in the console.
+If the port hasn't been opened yet, this will print a warning to the console and continue.
 
 
 ### Finding out how many bytes are available for reading
@@ -37,8 +37,6 @@ If the port is not yet available, you'll a notification in the console.
 ```
 print(port.available() + ' bytes received');
 ```
-
-avilable returns the number of bytes available for reading.
 
 
 ### Reading data

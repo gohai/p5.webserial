@@ -26,10 +26,12 @@ If the first argument is the string "Arduino" or "MicroPython", the dialog will 
 ### Writing data
 
 ```
-port.write('Hello from the computer');
+port.write('Hello from the computer\n');
 ```
 
 If the port hasn't been opened yet, this will print a warning to the console and continue.
+
+write will transmit data exactly as given. If your microcontroller expects a newline character at the end of the line you need to pass it as well (as done above).
 
 
 ### Finding out how many bytes are available for reading

@@ -40,7 +40,7 @@ function connect() {
 }
 
 function send() {
-  let output = 'Hello from the computer';
+  let output = 'Hello from the computer\n';
   port.write(output);
   textmovers.push(new TextMover(output, false));
 }

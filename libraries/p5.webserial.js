@@ -51,6 +51,11 @@ p5.prototype.WebSerial = class {
   }
 
   available() {
+    // XXX: UTF-8
+    return this.inLength;
+  }
+
+  availableBytes() {
     return this.inLength;
   }
 
@@ -91,11 +96,49 @@ p5.prototype.WebSerial = class {
   }
 
   last() {
-    // XXX: how to properly deal with UTF-8 here?
-    if (this.inLength) {
-      const view = new Uint8Array(this.inBuffer, this.inLength-1, 1);
-      this.inLength = 0;  // on Processing last() clears the buffer
-      return this.textDecoder.decode(view);
+    if (!this.inLength) {
+      return '';
+    }
+
+    const view = new Uint8Array(this.inBuffer, 0, this.inLength);
+
+    let startByteOffset = null;
+    let byteLength = null;
+
+    for (let i=view.length-1; 0 <= i; i--) {
+      const byte = view[i];
+      if (byte >> 7 == 0b0) {
+        startByteOffset = i;
+        byteLength = 1;
+        break;
+      } else if (byte >> 5 == 0b110 && i < view.length-1) {
+        startByteOffset = i;
+        byteLength = 2;
+        break;
+      } else if (byte >> 4 == 0b1110 && i < view.length-2) {
+        startByteOffset = i;
+        byteLength = 3;
+        break;
+      } else if (byte >> 3 == 0b11110 && i < view.length-3) {
+        startByteOffset = i;
+        byteLength = 4;
+        break;
+      }
+    }
+
+    if (startByteOffset !== null) {
+      const view2 = new Uint8Array(this.inBuffer, startByteOffset, byteLength);
+      const str = this.textDecoder.decode(view2);
+
+      // shift in buffer
+      if (startByteOffset+byteLength < this.inLength) {
+        const src = new Uint8Array(this.inBuffer, startByteOffset+byteLength, this.inLength-byteLength-startByteOffset);
+        const dst = new Uint8Array(this.inBuffer, 0, this.inLength-byteLength-startByteOffset);
+        dst.set(src);
+      }
+      this.inLength -= startByteOffset+byteLength;
+
+      return str;
     } else {
       return '';
     }
@@ -140,19 +183,107 @@ p5.prototype.WebSerial = class {
   };
 
   read(length) {
-    // XXX: how to properly deal with UTF-8 here?
-    const buffer = this.readArrayBuffer(length);
+    if (!this.inLength || length === 0) {
+      return '';
+    }
 
-    if (buffer.length) {
-      return this.textDecoder.decode(buffer);
+    const view = new Uint8Array(this.inBuffer, 0, this.inLength);
+
+    // 0xxxxxxx
+    // 110xxxxx 10xxxxxx
+    // 1110xxxx 10xxxxxx 10xxxxxx
+    // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+
+    let codepointToConsume = 0;
+    let startByteOffset = null;
+    let byteLength = null;
+    let charLength = 0;
+
+    for (let i=0; i < view.length; i++) {
+      const byte = view[i];
+      //console.log('Byte', byte);
+
+      let codepointStart;
+      if (byte >> 7 == 0b0) {
+        codepointStart = true;
+        codepointToConsume = 0;
+        //console.log('ASCII character');
+      } else if (byte >> 5 == 0b110) {
+        codepointStart = true;
+        codepointToConsume = 1;
+        //console.log('Begin 2-byte codepoint');
+      } else if (byte >> 4 == 0b1110) {
+        codepointStart = true;
+        codepointToConsume = 2;
+        //console.log('Begin 3-byte codepoint');
+      } else if (byte >> 3 == 0b11110) {
+        codepointStart = true;
+        codepointToConsume = 3;
+        //console.log('Begin 4-byte codepoint');
+      } else {
+        codepointStart = false;
+        codepointToConsume--;
+        //console.log('Continuation codepoint');
+      }
+
+      if (startByteOffset === null && codepointStart) {
+        startByteOffset = i;
+        //console.log('String starts at', i);
+      }
+      if (startByteOffset !== null && codepointToConsume <= 0) {
+        charLength++;
+        byteLength = i-startByteOffset+1;
+        //console.log('Added character', charLength, 'characters', byteLength, 'bytes');
+      }
+      if (length <= charLength) {
+        //console.log('Enough characters');
+        break;
+      }
+    }
+
+    if (startByteOffset !== null && byteLength !== null) {
+      const view2 = new Uint8Array(this.inBuffer, startByteOffset, byteLength);
+      const str = this.textDecoder.decode(view2);
+      //console.log('String is', str);
+
+      // shift in buffer
+      if (startByteOffset+byteLength < this.inLength) {
+        const src = new Uint8Array(this.inBuffer, startByteOffset+byteLength, this.inLength-byteLength-startByteOffset);
+        const dst = new Uint8Array(this.inBuffer, 0, this.inLength-byteLength-startByteOffset);
+        dst.set(src);
+      }
+      this.inLength -= startByteOffset+byteLength;
+
+      return str;
     } else {
       return '';
     }
   }
 
   readUntil(needle) {
-    // XXX: how to properly deal with UTF-8 here?
-    const buffer = this.readArrayBufferUntil(needle);
+    let buffer = this.readArrayBufferUntil(needle);
+
+    // trim leading invalid bytes, as does read()
+    let i;
+    for (i=0; i < buffer.length; i++) {
+      const byte = buffer[i];
+      if (byte >> 7 == 0b0) {
+        break;
+      } else if (byte >> 5 == 0b110) {
+        break;
+      } else if (byte >> 4 == 0b1110) {
+        break;
+      } else if (byte >> 3 == 0b11110) {
+        break;
+      }
+    }
+    if (0 < i) {
+      const newBuffer = new ArrayBuffer(buffer.length-i);
+      const src = new Uint8Array(buffer.buffer, i, buffer.length-i);
+      const dst = new Uint8Array(newBuffer, 0, buffer.length-i);
+      dst.set(src);
+      buffer = dst;
+    }
 
     if (buffer.length) {
       return this.textDecoder.decode(buffer);
@@ -165,7 +296,7 @@ p5.prototype.WebSerial = class {
     if (this.inLength) {
       length = Math.min(length, this.inLength);
       const view = new Uint8Array(this.inBuffer, 0, length);
-      const buffer = new Uint8Array(view);
+      const buffer = new Uint8Array(view);  // XXX: needs .buffer?
 
       // shift in buffer
       if (length < this.inLength) {
@@ -182,12 +313,46 @@ p5.prototype.WebSerial = class {
   }
 
   readArrayBufferUntil(needle) {
-    const view = new Uint8Array(this.inBuffer);
+    // check argument
+    if (typeof needle === 'string') {
+      needle = this.textEncoder.encode(needle);
+    } else if (typeof needle === 'number' && Number.isInteger(needle)) {
+      if (needle < 0 || 255 < needle) {
+        throw new TypeError('Argument needs to be between 0 and 255');
+      }
+      needle = new Uint8Array([ needle ]);
+    } else if (Array.isArray(needle)) {
+      for (let i=0; i < needle.length; i++) {
+        if (typeof needle[i] !== 'number' || !Number.isInteger(needle) ||
+            needle[i] < 0 || 255 < needle[i]) {
+              throw new TypeError('Array contained a value that wasn\'t an integer, or outside of 0 to 255');
+        }
+      }
+      needle = new Uint8Array(needle);
+    } else if (needle instanceof Uint8Array) {
+      // nothing to do
+    } else {
+      throw new TypeError('Supported types are: string, integer number [0..255], array of integer numbers [0..255], Uint8Array');
+    }
+
+    if (!needle.length) {
+      return new Uint8Array([]);
+    }
+
+    const view = new Uint8Array(this.inBuffer, 0, this.inLength);
+
+    let needleMatchLen = 0;
 
     for (let i=0; i < view.length; i++) {
-      if (view[i] === needle) {
+      if (view[i] === needle[needleMatchLen]) {
+        needleMatchLen++;
+      } else {
+        needleMatchLen = 0;
+      }
+
+      if (needleMatchLen == needle.length) {
         let src = new Uint8Array(this.inBuffer, 0, i+1);
-        const buffer = new Uint8Array(src);
+        const buffer = new Uint8Array(src);  // XXX: needs .buffer?
 
         // shift in buffer
         if (i+1 < view.length) {
@@ -195,7 +360,7 @@ p5.prototype.WebSerial = class {
           const dst = new Uint8Array(this.inBuffer, 0, this.inLength-i-1);
           dst.set(src);
         }
-        this.inLength -= i+2;
+        this.inLength -= i+1;
 
         return buffer;
       }
@@ -236,8 +401,6 @@ p5.prototype.WebSerial = class {
 
   async selectPort(args) {
     let filters = [{}];
-
-    console.log(args);
 
     if (1 <= args.length) {
       if (Array.isArray(args[0])) {
@@ -294,20 +457,23 @@ p5.prototype.WebSerial = class {
     if (typeof out === 'string') {
       buffer = this.textEncoder.encode(out);
     } else if (typeof out === 'number' && Number.isInteger(out)) {
+      // XXX: should this take a number even?
       if (out < 0 || 255 < out) {
-        throw new TypeError('Number needs to be between 0 and 255');
+        throw new TypeError('Argument needs to be between 0 and 255');
       }
       buffer = new Uint8Array([ out ]);
     } else if (Array.isArray(out)) {
       for (let i=0; i < out.length; i++) {
-        if (typeof out[i] !== 'number' || Number.isInteger(out) ||
+        if (typeof out[i] !== 'number' || !Number.isInteger(out) ||
             out[i] < 0 || 255 < out[i]) {
-              throw new TypeError('Array contained a value that wasn\'t an integer, our outside of 0 to 255');
+              throw new TypeError('Array contained a value that wasn\'t an integer, or outside of 0 to 255');
         }
       }
       buffer = new Uint8Array(out);
+    } else if (out instanceof ArrayBuffer || ArrayBuffer.isView(out)) {
+      buffer = out;
     } else {
-      throw new TypeError('Supported types for write are: string, integer number [0..255] or array of integer numbers [0..255]');
+      throw new TypeError('Supported types are: string, integer number [0..255], array of integer numbers [0..255], ArrayBuffer, TypedArray or DataView');
     }
 
     if (!this.port || !this.port.writable) {
@@ -331,7 +497,7 @@ p5.prototype.WebSerial = class {
       await this.port.open(this.options);
       console.log('Connected to serial port');
     } catch (error) {
-      console.error(error);  // this might happen when the port is already open in another tab
+      console.error(error.message);  // this might happen when the port is already open in another tab
       return false;
     }
 
@@ -353,6 +519,7 @@ p5.prototype.WebSerial = class {
             // XXX: use a ring buffer instead?
 
             // discard the oldest parts of the input buffer on overflow
+            // XXX: audit all memset
             if (this.inBuffer.byteLength < this.inLength + value.length) {
               const src = new Uint8Array(this.inBuffer, this.inLength+value.length-this.inBuffer.byteLength, this.inBuffer.byteLength-value.length);
               const dst = new Uint8Array(this.inBuffer, 0, this.inBuffer.byteLength-value.length);
@@ -365,7 +532,6 @@ p5.prototype.WebSerial = class {
             const dst = new Uint8Array(this.inBuffer, this.inLength, value.length);
             dst.set(value);
             this.inLength += value.length;
-            console.log(this.inLength);
           }
         }
       } catch (error) {

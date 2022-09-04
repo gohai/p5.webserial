@@ -1,7 +1,6 @@
 let port;
 let connectBtn;
 let sendBtn;
-
 let textmovers = [];
 
 function setup() {
@@ -9,18 +8,27 @@ function setup() {
 
   connectBtn = createButton('Connect to Arduino');
   connectBtn.position(10, 10);
-  connectBtn.mousePressed(connect);
+  connectBtn.mousePressed(connectBtnClick);
 
   sendBtn = createButton('Send');
   sendBtn.position(10, 10);
   sendBtn.hide();
-  sendBtn.mousePressed(send);
+  sendBtn.mousePressed(sendBtnClick);
+
+  // automatically connect if possible
+  let ports = usedSerialPorts();
+  if (ports.length > 0) {
+    port = createSerial(ports[0], 57600);
+  }
 }
 
 function draw() {
   background(0);
 
-  if (port) {  // the port might not have been opened here
+  if (port) {
+    connectBtn.hide();
+    sendBtn.show();
+
     let input = port.readUntil('\n');
     if (input.length > 0) {
       textmovers.push(new TextMover(input.trim(), true));
@@ -33,13 +41,11 @@ function draw() {
   }
 }
 
-function connect() {
-  port = new WebSerial('Arduino', 57600);
-  connectBtn.hide();
-  sendBtn.show();
+function connectBtnClick(port) {
+  port = createSerial('Arduino', 57600);
 }
 
-function send() {
+function sendBtnClick() {
   let output = 'Hello from the computer\n';
   port.write(output);
   textmovers.push(new TextMover(output, false));

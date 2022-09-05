@@ -27,10 +27,13 @@ function draw() {
   // make received text scroll up
   copy(0, 0, width, height, 0, -1, width, height);
 
-  // add new lines of text to the bottom
-  let str = port.readUntil("\n");
-  if (str.length > 0) {
-    text(str, 10, height-20);
+  // read in complete lines and add them to the
+  // bottom of the canvas
+  if (port) {
+    let str = port.readUntil("\n");
+    if (str.length > 0) {
+      text(str, 10, height-20);
+    }
   }
 
   // change button label based on connection status
@@ -50,5 +53,7 @@ function connectBtnClick() {
 }
 
 function sendBtnClick() {
-  port.write("Hello from p5.js\n");
+  if (port) {
+    port.write("Hello from p5.js\n");
+  }
 }

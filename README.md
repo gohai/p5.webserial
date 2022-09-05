@@ -1,65 +1,160 @@
 # p5.webserial.js
 
-A library for p5.js which adds support for interacting with Serial devices, using the Web Serial API (currently supported on Chrome and Edge).
+A library for p5.js which adds support for interacting with Serial devices, using the Web Serial API (currently supported on Chrome and Edge). It provides the following features:
 
-Download the library file [here](https://github.com/gohai/p5.webserial/blob/main/libraries/p5.webserial.js) or simply embed this script tag:
-```
-<script src="https://unpkg.com/@gohai/p5.webserial/libraries/p5.webserial.js"></script>
-```
+* Easy to use API, largely the same as Processing's [Serial library](https://processing.org/reference/libraries/serial/index.html)
+* No `async/await` or callbacks needed in sketches
+* Can automatically connect to previously-used serial ports (great for installations)
+* Unicode support (`Serial.print("你好"")` in Arduino work)
+* Multi-byte matching in `readUntil(needle)`
+* Well tested, also works in the p5.js web editor
 
+## Reference
+
+- [Usage]()
+- [API Reference]()
+- [Examples](examples/)
 
 ## Usage
 
-### Opening a port
+Download the [library file](https://github.com/gohai/p5.webserial/blob/main/libraries/p5.webserial.js) and include it in the `head` section of your HTML below the line that loads `p5.js` - or simply include the online version at the same place.
 
 ```
-let port = new WebSerial(baudRate)
-let port = new WebSerial('Arduino', baudRate)
-let port = new WebSerial('MicroPython', baudRate)
-```
-
-The constructor prompts the user to select a serial port for communication. Browsers allow showing this dialog only after user input, so add this code e.g. to `mouseClicked()`.
-
-If the first argument is the string "Arduino" or "MicroPython", the dialog will only list ports associated with the USB Vendor- and Product IDs of Arduino and various MicroPython boards respectively.
-
-
-### Writing data
+<script src="https://unpkg.com/@gohai/p5.webserial/libraries/p5.webserial.js"></script>
 
 ```
-port.write('Hello from the computer\n');
+or
+```
+<script src="p5.webserial.js"></script>
 ```
 
-If the port hasn't been opened yet, this will print a warning to the console and continue.
+### Opening ports
 
-write will transmit data exactly as given. If your microcontroller expects a newline character at the end of the line you need to pass it as well (as done above).
-
-
-### Finding out how many bytes are available for reading
+Prompts the user to select a serial port (at 9600 baud):
 
 ```
-print(port.available() + ' bytes received');
+let port = createSerial(9600);
 ```
 
+This will only show Arduino boards (and compatible) in the dialog: (Other presets are `MicroPython`, `RaspberryPi`, `Adafruit`.)
+
+```
+let port = createSerial('Arduino', 9600);
+```
+
+If the user has previously selected a serial port on a page, you can automatically connect to it on future page loads without user interaction like so:
+
+```
+let port;
+let usedPorts = usedSerialPorts();
+if (usedPorts > 0) {
+  port = createSerial(usedPorts[0], 9600);
+}
+```
+
+Most browsers will only show the dialog to select a port as a result of user input (see this example).
 
 ### Reading data
 
+This reads a single (Unicode) character from the serial port:
+
 ```
-let input = port.read();
-if (input.length > 0) {
-	print('Received: ' + input);
+let str = port.read(1);                   // returns e.g. "你"
+```
+
+This reads all available characters:
+
+```
+let str = port.read();                    // returns e.g. "你好"
+```
+
+This reads all characters till the end of a line: (This will return an empty string if the string given as parameter was not found.)
+
+```
+let str = port.readUntil("\n");           // returns the whole line
+
+```
+
+This also works with more than one character to look for:
+
+```
+let str = port.readUntil("STOP");         // returns everything up to and including "STOP"
+
+```
+
+This returns the most reccently returned character, discarding all previously received ones as well:
+
+```
+let str = port.last();
+```
+
+These methods allow you to receive (raw) bytes as values from 0 to 255 instead of characters:
+
+```
+let num = port.readByte();                // returns a single byte, e.g. 72
+let arr = port.readBytes(2);              // returns two bytes in an array, e.g. [ 72, 69 ]
+let arr = port.readBytes();               // returns all bytes in an array, e.g. [ 72, 69, ..]
+let arr = port.readBytesUntil(10);        // returns all bytes till value 10 in an array
+let arr = port.readBytesUntil([13, 10]);  // returns all bytes till value 13 followed by 10 in an array
+let num = port.lastByte();                // returns a single byte, e.g. 10
+```
+
+To find out how many characters (or bytes) are available to be read immediately:
+
+```
+let characters = port.available();        // how many characters
+let bytes = port.availableBytes();        // how many bytes
+```
+
+### Writing data
+
+To send "HELLO" over the serial port:
+
+```
+port.write("HELLO");
+```
+
+To send the value 72 as a sequence of digits (the characters "7" and "2"): (you want to do this most of the time)
+
+```
+port.write(String(72));
+```
+
+To send a single byte with the value 72:
+
+```
+port.write(72);
+
+```
+
+To send a series of bytes:
+
+```
+port.write([72, 69, 76, 76, 79]);
+
+```
+
+### Other
+
+To check if the serial port is open:
+
+```
+if (port.opened()) {
+  // the port is open and can be read and written to
 }
 ```
 
-read returns the received data as a string. This function returns an empty string if no data has been received.
-
-
-### Reading data up to a special character
+To close the port:
 
 ```
-let input = port.readUntil("\n");
-if (input.length > 0) {
-	print('Received: ' + input.trim());
-}
+port.stop();
 ```
 
-readUntil returns all received data up to (and including) the provided character. This function returns empty string if the character to look for is not found.
+To clear everything in the input buffer:
+
+```
+port.clear();
+
+```
+
+## Limitations

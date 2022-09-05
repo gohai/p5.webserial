@@ -16,9 +16,9 @@ function setup() {
   sendBtn.mousePressed(sendBtnClick);
 
   // automatically connect if possible
-  let ports = usedSerialPorts();
-  if (ports.length > 0) {
-    port = createSerial(ports[0], 57600);
+  let usedPorts = usedSerialPorts();
+  if (usedPorts.length > 0) {
+    port = createSerial(usedPorts[0], 9600);
   }
 }
 
@@ -29,9 +29,9 @@ function draw() {
     connectBtn.hide();
     sendBtn.show();
 
-    let input = port.readUntil('\n');
-    if (input.length > 0) {
-      textmovers.push(new TextMover(input.trim(), true));
+    let data = port.readUntil('\n');
+    if (data.length > 0) {
+      textmovers.push(new TextMover(data.trim(), true));
     }
   }
 
@@ -42,6 +42,8 @@ function draw() {
 }
 
 function connectBtnClick(port) {
+  // this will only show a dialog in reaction to user input
+  // like in this event handler for a button click
   port = createSerial('Arduino', 57600);
 }
 

@@ -7,12 +7,11 @@ A library for p5.js which adds support for interacting with Serial devices, usin
 * Can automatically connect to previously-used serial ports (great for installations)
 * Unicode support (`Serial.print("你好"")` in Arduino)
 * Multi-byte matching in `readUntil(needle)`
-* Well tested, also works in the p5.js web editor
+* Well tested, also works [in the p5.js web editor](https://editor.p5js.org/gohai/sketches/X0XD9xvIR)
 
 ## Reference
 
 - [Getting started](#getting-started)
-- [API Reference]()
 - [Examples](examples/)
 
 ## Getting started
@@ -152,3 +151,5 @@ port.clear();
 ```
 
 ## Limitations
+
+- WebSerial might not work on sites served over the insecure `http://` protocol, so try to use a server that uses `https://` instead. (Presently, localhost works fine over http on Chrome however.)

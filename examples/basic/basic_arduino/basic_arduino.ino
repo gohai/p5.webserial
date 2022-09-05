@@ -2,7 +2,7 @@ int lines = 0;
 unsigned long lastSent = 0;
 
 void setup() {
-  Serial.begin(57600);
+  Serial.begin(9600);
 }
 
 void loop() {

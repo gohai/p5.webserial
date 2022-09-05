@@ -592,7 +592,7 @@
           // nothing to do if we got passed a SerialPort instance
         }
       } catch (error) {
-        console.error(error.message);
+        console.warn(error.message);
         this.port = null;
       }
     }
@@ -602,7 +602,7 @@
      */
     async start() {
       if (!this.port) {
-        console.error('No serial port selected');
+        console.error('No serial port selected.');
         return;
       }
 
@@ -611,7 +611,11 @@
         console.log('Connected to serial port');
         this.keepReading = true;
       } catch (error) {
-        console.error(error.message);  // this might happen when the port is already open in another tab
+        let msg = error.message;
+        if (msg === 'Failed to open serial port.') {
+          msg += ' (The port might already be open in another tab or program, e.g. the Arduino Serial Monitor.)';
+        }
+        console.error(msg);
         return;
       }
 

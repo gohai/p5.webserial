@@ -28,29 +28,38 @@ or
 
 #### Opening ports
 
-This prompts the user to select a serial port (at 9600 baud):
+Create a global variable, and set it to a new serial port instance inside setup:
 
 ```
-let port = createSerial(9600);
+let port;
+
+function setup() {
+  port = createSerial();
+  // ...
+```
+
+To actually open a serial port, call the `open` method with the desired arguments. This prompts the user to select a serial port (at 9600 baud):
+
+```
+port.open(9600);
 ```
 
 This will only show Arduino boards (and compatible) in the dialog: (Other presets are `MicroPython`, `RaspberryPi`, `Adafruit`)
 
 ```
-let port = createSerial('Arduino', 9600);
+port.open('Arduino', 9600);
 ```
 
-If the user has previously selected a serial port on a page, you can automatically connect to it on future page loads without user interaction like so:
+Most browsers will only show the port picker dialog as a result of user input, e.g. after clicking a button, so you likely will need to do this outside of setup. (see this [example](examples/basic/basic_p5js/sketch.js) for how)
+
+If the user has previously selected a serial port on a page, you can automatically connect to it on future page loads without user interaction, even inside setup, like so:
 
 ```
-let port;
 let usedPorts = usedSerialPorts();
 if (usedPorts.length > 0) {
-  port = createSerial(usedPorts[0], 9600);
+  port.open(usedPorts[0], 9600);
 }
 ```
-
-Most browsers will only show the dialog to select a port as a result of user input (see this [example](examples/basic/basic_p5js/sketch.js)).
 
 #### Reading data
 
@@ -141,7 +150,7 @@ if (port.opened()) {
 To close the port:
 
 ```
-port.stop();
+port.close();
 ```
 
 To clear everything in the input buffer:

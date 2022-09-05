@@ -54,32 +54,20 @@
 
 
   /**
-   * Create and open a serial port.
-   *
-   * used like:
-   * - createSerial();
-   * - createSerial(57600);
-   * - createSerial('Arduino');
-   * - createSerial(usedSerialPorts()[0]);
-   * - createSerial('Arduino', 57600);
-   * - createSerial(usedSerialPorts()[0], 57600);
+   * Create a and return a WebSerial instance.
    */
   p5.prototype.createSerial = function() {
-    const args = [this];                                // this adds the calling p5 instance to the arguments
-    for (let i=0; i < arguments.length; i++) {
-      args.push(arguments[i]);
-    }
-    return new p5.prototype.WebSerial(...args);         // before returning a newly-invoked object
+    return new p5.prototype.WebSerial(this);
   }
 
 
   p5.prototype.WebSerial = class {
 
-    constructor() {
+    constructor(p5inst) {
       this.options     = { baudRate: 9600 };            // for port.open()
       this.port        = null;                          // SerialPort object
       this.reader      = null;                          // ReadableStream object
-      this.keepReading = true;                          // set to false by stop()
+      this.keepReading = true;                          // set to false by close()
       this.inBuf       = new ArrayBuffer(1024 * 1024);  // 1M
       this.inLen       = 0;                             // bytes in inBuf
       this.textEncoder = new TextEncoder();             // to convert to UTF-8
@@ -90,15 +78,9 @@
        throw new Error('WebSerial is not supported in your browser (try Chrome or Edge)');
       }
 
-      let args = Array.from(arguments);
-      if (args.length && args[0] instanceof p5) {       // this first argument might be a p5 instance
-        this.p5 = args.shift();                         // might be used for callbacks in the future
+      if (p5inst instanceof p5) {                       // this ony argument might be a p5 instance
+        this.p5 = p5inst;                               // might be used for callbacks in the future
       }
-
-      (async () => {
-        await this.selectPort(...args);                 // sets options and port
-        await this.start();                             // opens the port and starts the read-loop
-      })();
     }
 
     /**
@@ -162,6 +144,19 @@
      */
     clear() {
       this.inLen = 0;
+    }
+
+    /**
+     * Closes the serial port.
+     * @method close
+     */
+    close() {
+      if (this.reader) {
+        this.keepReading = false;
+        this.reader.cancel();
+      } else {
+        console.log('Serial port is already closed');
+      }
     }
 
     /**
@@ -232,6 +227,24 @@
       } else {
         return null;
       }
+    }
+
+
+    /**
+     * Opens a port based on arguments
+     * e.g.
+     * - open();
+     * - open(57600);
+     * - open('Arduino');
+     * - open(usedSerialPorts()[0]);
+     * - open('Arduino', 57600);
+     * - open(usedSerialPorts()[0], 57600);
+     */
+    open() {
+      (async () => {
+        await this.selectPort(...arguments);            // sets options and port
+        await this.start();                             // opens the port and starts the read-loop
+      })();
     }
 
     /**
@@ -660,19 +673,6 @@
       this.port.close();
       this.reader = null;
       console.log('Disconnected from serial port');
-    }
-
-    /**
-     * Closes the serial port.
-     * @method stop
-     */
-    stop() {
-      if (this.reader) {
-        this.keepReading = false;
-        this.reader.cancel();
-      } else {
-        console.log('Serial port is already closed');
-      }
     }
 
     /**

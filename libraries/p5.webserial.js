@@ -241,7 +241,7 @@
      * @return {Boolean} true if the port is open, false if not
      */
     opened() {
-      return (typeof this.port === 'object' && this.port.readable !== null);
+      return (this.port instanceof SerialPort && this.port.readable !== null);
     }
 
     presets = {

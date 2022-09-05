@@ -5,23 +5,22 @@ A library for p5.js which adds support for interacting with Serial devices, usin
 * Easy to use API, largely the same as Processing's [Serial library](https://processing.org/reference/libraries/serial/index.html)
 * No `async/await` or callbacks needed in sketches
 * Can automatically connect to previously-used serial ports (great for installations)
-* Unicode support (`Serial.print("你好"")` in Arduino work)
+* Unicode support (`Serial.print("你好"")` in Arduino)
 * Multi-byte matching in `readUntil(needle)`
 * Well tested, also works in the p5.js web editor
 
 ## Reference
 
-- [Usage]()
+- [Getting started]
 - [API Reference]()
 - [Examples](examples/)
 
-## Usage
+## Getting started
 
-Download the [library file](https://github.com/gohai/p5.webserial/blob/main/libraries/p5.webserial.js) and include it in the `head` section of your HTML below the line that loads `p5.js` - or simply include the online version at the same place.
+Download the [library file](https://github.com/gohai/p5.webserial/blob/main/libraries/p5.webserial.js) and include it in the `head` section of your HTML below the line that loads `p5.js` - or simply include the online version at the same place:
 
 ```
 <script src="https://unpkg.com/@gohai/p5.webserial/libraries/p5.webserial.js"></script>
-
 ```
 or
 ```
@@ -30,13 +29,13 @@ or
 
 ### Opening ports
 
-Prompts the user to select a serial port (at 9600 baud):
+This prompts the user to select a serial port (at 9600 baud):
 
 ```
 let port = createSerial(9600);
 ```
 
-This will only show Arduino boards (and compatible) in the dialog: (Other presets are `MicroPython`, `RaspberryPi`, `Adafruit`.)
+This will only show Arduino boards (and compatible) in the dialog: (Other presets are `MicroPython`, `RaspberryPi`, `Adafruit`)
 
 ```
 let port = createSerial('Arduino', 9600);
@@ -47,12 +46,12 @@ If the user has previously selected a serial port on a page, you can automatical
 ```
 let port;
 let usedPorts = usedSerialPorts();
-if (usedPorts > 0) {
+if (usedPorts.length > 0) {
   port = createSerial(usedPorts[0], 9600);
 }
 ```
 
-Most browsers will only show the dialog to select a port as a result of user input (see this example).
+Most browsers will only show the dialog to select a port as a result of user input (see this [example](examples/basic/basic_p5js/sketch.js)).
 
 ### Reading data
 
@@ -72,17 +71,15 @@ This reads all characters till the end of a line: (This will return an empty str
 
 ```
 let str = port.readUntil("\n");           // returns the whole line
-
 ```
 
 This also works with more than one character to look for:
 
 ```
 let str = port.readUntil("STOP");         // returns everything up to and including "STOP"
-
 ```
 
-This returns the most reccently returned character, discarding all previously received ones as well:
+This returns the most reccently returned character, discarding all previously received ones in the process:
 
 ```
 let str = port.last();
@@ -95,7 +92,7 @@ let num = port.readByte();                // returns a single byte, e.g. 72
 let arr = port.readBytes(2);              // returns two bytes in an array, e.g. [ 72, 69 ]
 let arr = port.readBytes();               // returns all bytes in an array, e.g. [ 72, 69, ..]
 let arr = port.readBytesUntil(10);        // returns all bytes till value 10 in an array
-let arr = port.readBytesUntil([13, 10]);  // returns all bytes till value 13 followed by 10 in an array
+let arr = port.readBytesUntil([13, 10]);  // returns all bytes till value 13 followed by 10
 let num = port.lastByte();                // returns a single byte, e.g. 10
 ```
 
@@ -124,14 +121,12 @@ To send a single byte with the value 72:
 
 ```
 port.write(72);
-
 ```
 
 To send a series of bytes:
 
 ```
 port.write([72, 69, 76, 76, 79]);
-
 ```
 
 ### Other
@@ -140,7 +135,7 @@ To check if the serial port is open:
 
 ```
 if (port.opened()) {
-  // the port is open and can be read and written to
+  // the port is indeed open
 }
 ```
 
@@ -154,7 +149,6 @@ To clear everything in the input buffer:
 
 ```
 port.clear();
-
 ```
 
 ## Limitations

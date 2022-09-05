@@ -11,7 +11,7 @@ A library for p5.js which adds support for interacting with Serial devices, usin
 
 ## Reference
 
-- [Getting started]
+- [Getting started](#getting-started)
 - [API Reference]()
 - [Examples](examples/)
 
@@ -27,7 +27,7 @@ or
 <script src="p5.webserial.js"></script>
 ```
 
-### Opening ports
+#### Opening ports
 
 This prompts the user to select a serial port (at 9600 baud):
 
@@ -53,7 +53,7 @@ if (usedPorts.length > 0) {
 
 Most browsers will only show the dialog to select a port as a result of user input (see this [example](examples/basic/basic_p5js/sketch.js)).
 
-### Reading data
+#### Reading data
 
 This reads a single (Unicode) character from the serial port:
 
@@ -103,7 +103,7 @@ let characters = port.available();        // how many characters
 let bytes = port.availableBytes();        // how many bytes
 ```
 
-### Writing data
+#### Writing data
 
 To send "HELLO" over the serial port:
 
@@ -129,7 +129,7 @@ To send a series of bytes:
 port.write([72, 69, 76, 76, 79]);
 ```
 
-### Other
+#### Other
 
 To check if the serial port is open:
 

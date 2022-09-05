@@ -1,54 +1,54 @@
+// This example is also available online in the p5.js web editor:
+// https://editor.p5js.org/gohai/sketches/X0XD9xvIR
+
 let port;
 let connectBtn;
-let sendBtn;
-let textmovers = [];
 
 function setup() {
-  createCanvas(600, 400);
-
+  createCanvas(400, 400);
+  background(220);
+  
   connectBtn = createButton('Connect to Arduino');
-  connectBtn.position(10, 10);
+  connectBtn.position(80, 200);
   connectBtn.mousePressed(connectBtnClick);
 
-  sendBtn = createButton('Send');
-  sendBtn.position(10, 10);
-  sendBtn.hide();
+  let sendBtn = createButton('Send hello');
+  sendBtn.position(220, 200);
   sendBtn.mousePressed(sendBtnClick);
 
-  // automatically connect if possible
+  // automatically open ports we've used before
   let usedPorts = usedSerialPorts();
   if (usedPorts.length > 0) {
-    port = createSerial(usedPorts[0], 9600);
+    port = createSerial(usedPorts[0], 57600);
   }
 }
 
 function draw() {
-  background(0);
+  // make received text scroll up
+  copy(0, 0, width, height, 0, -1, width, height);
 
-  if (port) {
-    connectBtn.hide();
-    sendBtn.show();
-
-    let data = port.readUntil('\n');
-    if (data.length > 0) {
-      textmovers.push(new TextMover(data.trim(), true));
-    }
+  // add new lines of text to the bottom
+  let str = port.readUntil("\n");
+  if (str.length > 0) {
+    text(str, 10, height-20);
   }
 
-  for (let i=0; i < textmovers.length; i++) {
-    textmovers[i].move();
-    textmovers[i].display();
+  // change button label based on connection status
+  if (!port || !port.opened()) {
+    connectBtn.html('Connect to Arduino');
+  } else {
+    connectBtn.html('Disconnect');
   }
 }
 
-function connectBtnClick(port) {
-  // this will only show a dialog in reaction to user input
-  // like in this event handler for a button click
-  port = createSerial('Arduino', 57600);
+function connectBtnClick() {
+  if (!port || !port.opened()) {
+    port = createSerial('Arduino', 57600);
+  } else {
+    port.stop();
+  }
 }
 
 function sendBtnClick() {
-  let output = 'Hello from the computer\n';
-  port.write(output);
-  textmovers.push(new TextMover(output, false));
+  port.write("Hello from p5.js\n");
 }

@@ -20,7 +20,7 @@ A library for p5.js which adds support for interacting with Serial devices, usin
 Download the [library file](https://github.com/gohai/p5.webserial/blob/main/libraries/p5.webserial.js) and include it in the `head` section of your HTML below the line that loads `p5.js` - or simply include the online version at the same place:
 
 ```
-<script src="https://unpkg.com/@gohai/p5.webserial/libraries/p5.webserial.js"></script>
+<script src="https://unpkg.com/@gohai/p5.webserial@^1/libraries/p5.webserial.js"></script>
 ```
 or
 ```

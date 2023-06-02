@@ -8,6 +8,7 @@ A library for p5.js which adds support for interacting with Serial devices, usin
 * Unicode support (`Serial.print("你好"")` in Arduino)
 * Multi-byte matching in `readUntil(needle)`
 * Well tested, also works [in the p5.js web editor](https://editor.p5js.org/gohai/sketches/X0XD9xvIR)
+* Also supported on Chrome for Android
 
 ## Reference
 

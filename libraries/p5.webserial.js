@@ -168,6 +168,17 @@
     }
 
     /**
+     * Returns whether or not the argument is a SerialPort (either native
+     * or polyfill)
+     * @param {object} port
+     * @return {Boolean}
+     */
+    isSerialPort(port) {
+      const nativeSerialPort = window.SerialPort;
+      return (port instanceof nativeSerialPort || port instanceof SerialPort);
+    }
+
+    /**
      * Returns the last character received.
      * This method clears the input buffer afterwards, discarding its data.
      * @method last
@@ -262,7 +273,7 @@
      * @return {Boolean} true if the port is open, false if not
      */
     opened() {
-      return (this.port instanceof SerialPort && this.port.readable !== null);
+      return (this.isSerialPort(this.port) && this.port.readable !== null);
     }
 
     presets = {
@@ -578,7 +589,7 @@
       if (1 <= arguments.length) {
         if (Array.isArray(arguments[0])) {                // for requestPort(), verbatim
           filters = arguments[0];
-        } else if (arguments[0] instanceof SerialPort) {  // use SerialPort as-is, skip requestPort()
+        } else if (this.isSerialPort(arguments[0])) {     // use SerialPort as-is, skip requestPort()
           this.port = arguments[0];
           filters = null;
         } else if (typeof arguments[0] === 'object') {    // single vid/pid-containing object

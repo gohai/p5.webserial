@@ -1,6 +1,6 @@
 {
   "name": "@gohai/p5.webserial",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A library for p5.js which adds support for interacting with Serial devices, using the Web Serial API (currently supported on Chrome and Edge)",
   "main": "libraries/p5.webserial",
   "directories": {

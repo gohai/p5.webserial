@@ -658,13 +658,16 @@
 
       while (this.port.readable && this.keepReading) {
         this.reader = this.port.readable.getReader();
+        this.writer = this.port.writable.getWriter();
 
         try {
           while (true) {
             let { value, done } = await this.reader.read();
 
             if (done) {
-              this.reader.releaseLock();  // allow the serial port to be closed later
+              await this.writer.ready;    // wait for any outstanding writes to finish
+              this.writer.releaseLock();  // allow the serial port to be closed later
+              this.reader.releaseLock();
               break;
             }
 
@@ -737,9 +740,8 @@
         return false;
       }
 
-      const writer = this.port.writable.getWriter();
-      await writer.write(buffer);
-      writer.releaseLock();  // allow the serial port to be closed later
+      await this.writer.ready;  // wait for any outstanding writes to finish
+      await this.writer.write(buffer);
       return true;
     }
   }

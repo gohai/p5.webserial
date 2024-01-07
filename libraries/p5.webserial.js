@@ -168,6 +168,20 @@
     }
 
     /**
+     * Turns the DTR signal on or off
+     * @param {Boolean} assert true to assert the signal, false to deassert it
+     */
+    async dtr(assert) {
+      if (assert === undefined) {
+        throw new Error('Pass either true or false to dtr() to turn the Data Terminal Ready signal on or off');
+      } else if (assert) {
+        await this.port.setSignals({ dataTerminalReady: true });
+      } else {
+        await this.port.setSignals({ dataTerminalReady: false });
+      }
+    }
+
+    /**
      * Returns whether or not the argument is a SerialPort (either native
      * or polyfill)
      * @param {object} port
@@ -577,6 +591,20 @@
         bytes.push(out[i]);
       }
       return bytes;
+    }
+
+    /**
+     * Turns the RTS signal on or off
+     * @param {Boolean} assert true to assert the signal, false to deassert it
+     */
+    async rts(assert) {
+      if (assert === undefined) {
+        throw new Error('Pass either true or false to rts() to turn the Request To Send signal on or off');
+      } else if (assert) {
+        await this.port.setSignals({ requestToSend: true });
+      } else {
+        await this.port.setSignals({ requestToSend: false });
+      }
     }
 
     /**

@@ -160,6 +160,22 @@ To clear everything in the input buffer:
 port.clear();
 ```
 
+To setting the DTR (Data Terminal Ready) or RTS (Request to Send) lines:
+
+```
+port.dtr(true); // or port.dtr(false)
+port.rts(true); // or port.rts(false)
+```
+
+Resetting a connected Arduino Uno microcontroller e.g. works with:
+
+```
+port.dtr(false);
+setTimeout(function() {
+  port.dtr(true);
+}, 200);
+```
+
 ## Limitations
 
 - WebSerial might not work on sites served over the insecure `http://` protocol, so try to use a server that uses `https://` instead. (Presently, localhost works fine over http on Chrome however.)

@@ -19,11 +19,11 @@ A library for p5.js which adds support for interacting with Serial devices, usin
 
 Download the [library file](https://github.com/gohai/p5.webserial/blob/main/libraries/p5.webserial.js) and include it in the `head` section of your HTML below the line that loads `p5.js` - or simply include the online version at the same place:
 
-```
+```html
 <script src="https://unpkg.com/@gohai/p5.webserial@^1/libraries/p5.webserial.js"></script>
 ```
 or
-```
+```html
 <script src="p5.webserial.js"></script>
 ```
 
@@ -31,7 +31,7 @@ or
 
 Create a global variable, and set it to a new serial port instance inside setup:
 
-```
+```js
 let port;
 
 function setup() {
@@ -41,13 +41,13 @@ function setup() {
 
 To actually open a serial port, call the `open` method with the desired arguments. This prompts the user to select a serial port (at 9600 baud):
 
-```
+```js
 port.open(9600);
 ```
 
 This will only show Arduino boards (and compatible) in the dialog: (Other presets are `MicroPython`, `RaspberryPi`, `Adafruit`)
 
-```
+```js
 port.open('Arduino', 9600);
 ```
 
@@ -55,7 +55,7 @@ Most browsers will only show the port picker dialog as a result of user input, e
 
 If the user has previously selected a serial port on a page, you can automatically connect to it on future page loads without user interaction, even inside setup, like so:
 
-```
+```js
 let usedPorts = usedSerialPorts();
 if (usedPorts.length > 0) {
   port.open(usedPorts[0], 9600);
@@ -66,37 +66,37 @@ if (usedPorts.length > 0) {
 
 This reads a single (Unicode) character from the serial port:
 
-```
+```js
 let str = port.read(1);                   // returns e.g. "你"
 ```
 
 This reads all available characters:
 
-```
+```js
 let str = port.read();                    // returns e.g. "你好"
 ```
 
 This reads all characters till the end of a line: (This will return an empty string if the string given as parameter was not found.)
 
-```
+```js
 let str = port.readUntil("\n");           // returns the whole line
 ```
 
 This also works with more than one character to look for:
 
-```
+```js
 let str = port.readUntil("STOP");         // returns everything up to and including "STOP"
 ```
 
 This returns the most reccently returned character, discarding all previously received ones in the process:
 
-```
+```js
 let str = port.last();
 ```
 
 These methods allow you to receive (raw) bytes as values from 0 to 255 instead of characters:
 
-```
+```js
 let num = port.readByte();                // returns a single byte, e.g. 72
 let arr = port.readBytes(2);              // returns two bytes in an array, e.g. [ 72, 69 ]
 let arr = port.readBytes();               // returns all bytes in an array, e.g. [ 72, 69, ..]
@@ -107,7 +107,7 @@ let num = port.lastByte();                // returns a single byte, e.g. 10
 
 To find out how many characters (or bytes) are available to be read immediately:
 
-```
+```js
 let characters = port.available();        // how many characters
 let bytes = port.availableBytes();        // how many bytes
 ```
@@ -116,25 +116,25 @@ let bytes = port.availableBytes();        // how many bytes
 
 To send "HELLO" over the serial port:
 
-```
+```js
 port.write("HELLO");
 ```
 
 To send the value 72 as a sequence of digits (the characters "7" and "2"): (you want to do this most of the time)
 
-```
+```js
 port.write(String(72));
 ```
 
 To send a single byte with the value 72:
 
-```
+```js
 port.write(72);
 ```
 
 To send a series of bytes:
 
-```
+```js
 port.write([72, 69, 76, 76, 79]);
 ```
 
@@ -142,7 +142,7 @@ port.write([72, 69, 76, 76, 79]);
 
 To check if the serial port is open:
 
-```
+```js
 if (port.opened()) {
   // the port is indeed open
 }
@@ -150,26 +150,26 @@ if (port.opened()) {
 
 To close the port:
 
-```
+```js
 port.close();
 ```
 
 To clear everything in the input buffer:
 
-```
+```js
 port.clear();
 ```
 
 To setting the DTR (Data Terminal Ready) or RTS (Request to Send) lines:
 
-```
+```js
 port.dtr(true); // or port.dtr(false)
 port.rts(true); // or port.rts(false)
 ```
 
 Resetting a connected Arduino Uno microcontroller e.g. works with:
 
-```
+```js
 port.dtr(false);
 setTimeout(function() {
   port.dtr(true);

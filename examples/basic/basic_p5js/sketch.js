@@ -22,11 +22,9 @@ function setup() {
   // user interaction (see connectBtnClick below)
 
   connectBtn = createButton('Connect to Arduino');
-  connectBtn.position(80, 200);
   connectBtn.mousePressed(connectBtnClick);
 
   let sendBtn = createButton('Send hello');
-  sendBtn.position(220, 200);
   sendBtn.mousePressed(sendBtnClick);
 }
 

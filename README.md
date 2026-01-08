@@ -138,6 +138,16 @@ To send a series of bytes:
 port.write([72, 69, 76, 76, 79]);
 ```
 
+#### Writing strings
+
+For ergonomic reasons, `write("HELLO\n")` can also be accomplished like this:
+
+```
+port.println("HELLO");
+```
+
+`print()` is available as well, and will throw an exception when being passed anything but a String as the argument. There is no benefit over calling `write()`.
+
 #### Other
 
 To check if the serial port is open:

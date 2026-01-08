@@ -323,6 +323,26 @@
       ]
     };
 
+    async print(str) {
+      if (typeof str !== 'string') {
+        throw new TypeError('print expects a string as the argument. Use write() instead to send a byte or array of bytes.');
+      }
+      return this.write(str);
+    }
+
+    /**
+     * Prints a string followed by a \n newline character to the serial port.
+     * @method println
+     * @param {String} data to send
+     * @return {Boolean} true if the port was open, false if not
+     */
+    async println(str) {
+      if (typeof str !== 'string') {
+        throw new TypeError('println expects a string as the argument. Use write() instead to send a byte or array of bytes.');
+      }
+      return this.write(str + '\n');
+    }
+
     /**
      * Reads characters from the serial port and returns them as a string.
      * The data received over serial are expected to be UTF-8 encoded.

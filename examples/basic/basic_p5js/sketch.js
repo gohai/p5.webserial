@@ -58,5 +58,5 @@ function connectBtnClick() {
 }
 
 function sendBtnClick() {
-  port.write("Hello from p5.js\n");
+  port.println("Hello from p5.js");
 }

@@ -1,9 +1,9 @@
 let port;
 let connectBtn;
 
-let pos = 0;    // displacement from center
-let speed = 0;  // velocity
-let k = 0.005;  // spring constant
+let pos = 0; // displacement from center
+let speed = 0; // velocity
+let k = 0.005; // spring constant
 let damping = 0.995;
 let mousePressedTime = 0;
 let circleSize = 0;
@@ -37,12 +37,12 @@ function draw() {
   speed += force;
   speed *= damping;
   pos += speed;
-  
-  let servoPos = map(pos, -width/2, width/2, 0, 180);  // to 0-180
-  servoPos = constrain(pos, 0, 180);          // make sure we don't go beyond
-  servoPos = floor(servoPos);                 // floor() to get rid of decimals
+
+  let servoPos = map(pos, -width / 2, width / 2, 0, 180); // to 0-180
+  servoPos = constrain(pos, 0, 180); // make sure we don't go beyond
+  servoPos = floor(servoPos); // floor() to get rid of decimals
   port.println(servoPos);
-  
+
   // draw the mass
   noStroke();
   fill(50);

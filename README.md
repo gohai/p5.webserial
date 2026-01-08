@@ -117,13 +117,19 @@ let bytes = port.availableBytes();        // how many bytes
 To send "HELLO" over the serial port:
 
 ```
-port.write("HELLO");
+port.print("HELLO");
+```
+
+With a newline character at the end:
+
+```
+port.println("HELLO");
 ```
 
 To send the value 72 as a sequence of digits (the characters "7" and "2"): (you want to do this most of the time)
 
 ```
-port.write(String(72));
+port.print(72);
 ```
 
 To send a single byte with the value 72:
@@ -137,16 +143,6 @@ To send a series of bytes:
 ```
 port.write([72, 69, 76, 76, 79]);
 ```
-
-#### Writing strings
-
-For ergonomic reasons, `write("HELLO\n")` can also be accomplished like this:
-
-```
-port.println("HELLO");
-```
-
-`print()` is available as well, and will throw an exception when being passed anything but a String as the argument. There is no benefit over calling `write()`.
 
 #### Other
 

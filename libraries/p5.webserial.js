@@ -323,24 +323,36 @@
       ]
     };
 
-    async print(str) {
-      if (typeof str !== 'string') {
-        throw new TypeError('print expects a string as the argument. Use write() instead to send a byte or array of bytes.');
+    /**
+     * Prints data as a string to the serial port.
+     * @method print
+     * @param {String|Number} data to send
+     * @return {Boolean} true if the port was open, false if not
+     */
+    async print(out) {
+      if (typeof out === 'number') {
+        return this.write(String(out));
+      } else if (typeof out === 'string') {
+        return this.write(out);
+      } else {
+        throw new TypeError('print expects a string or a number as its argument. Use write() instead to send a byte or an array of bytes.');
       }
-      return this.write(str);
     }
 
     /**
-     * Prints a string followed by a \n newline character to the serial port.
+     * Prints data as a string to the serial port, followed by a \n newline character.
      * @method println
-     * @param {String} data to send
+     * @param {String|Number} data to send
      * @return {Boolean} true if the port was open, false if not
      */
-    async println(str) {
-      if (typeof str !== 'string') {
-        throw new TypeError('println expects a string as the argument. Use write() instead to send a byte or array of bytes.');
+    async println(out) {
+      if (typeof out === 'number') {
+        return this.write(String(out) + '\n');
+      } else if (typeof out === 'string') {
+        return this.write(out + '\n');
+      } else {
+        throw new TypeError('println expects a string or a number as its argument. Use write() instead to send a byte or an array of bytes.');
       }
-      return this.write(str + '\n');
     }
 
     /**
@@ -766,7 +778,7 @@
         buffer = this.textEncoder.encode(out);
       } else if (typeof out === 'number' && Number.isInteger(out)) {
         if (out < 0 || 255 < out) {
-          throw new TypeError('Write expects a number between 0 and 255 for sending it as a byte. To send any number as a sequence of digits instead, first convert it to a string before passing it to write().');
+          throw new TypeError('write expects a number between 0 and 255 to send it as a byte. To send any number as a sequence of digits, use print() or println() instead.');
         }
         buffer = new Uint8Array([ out ]);
       } else if (Array.isArray(out)) {

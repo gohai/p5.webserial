@@ -48,10 +48,10 @@ port.open(9600);
 This will only show Arduino boards (and compatible) in the dialog: (Other presets are `MicroPython`, `RaspberryPi`, `Adafruit`)
 
 ```
-port.open('Arduino', 9600);
+port.open("Arduino", 9600);
 ```
 
-Most browsers will only show the port picker dialog as a result of user input, e.g. after clicking a button, so you likely will need to do this outside of setup. (see this [example](examples/basic/basic_p5js/sketch.js) for how)
+Most browsers will only show the port picker dialog as a result of user input, e.g. after clicking a button, so you likely will need to do this outside of setup. (see this [example](examples/echo/echo_p5js/sketch.js) for how)
 
 If the user has previously selected a serial port on a page, you can automatically connect to it on future page loads without user interaction, even inside setup, like so:
 

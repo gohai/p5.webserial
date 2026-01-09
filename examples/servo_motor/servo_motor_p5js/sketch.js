@@ -1,3 +1,6 @@
+// Press and hold the mouse button to actuate
+// the servo motor
+
 let port;
 let connectBtn;
 
@@ -12,20 +15,17 @@ function setup() {
   createCanvas(400, 200);
 
   port = createSerial();
+  connectBtn = createButton("Connect to Arduino");
+  connectBtn.mousePressed(connectBtnClick);
 
   // in setup, we can open ports we have used previously
   // without user interaction
-
   let usedPorts = usedSerialPorts();
   if (usedPorts.length > 0) {
     port.open(usedPorts[0], 57600);
+    connectBtn.html("Disconnect");
+    //connectBtn.hide();
   }
-
-  // any other ports can be opened via a dialog after
-  // user interaction (see connectBtnClick below)
-
-  connectBtn = createButton("Connect to Arduino");
-  connectBtn.mousePressed(connectBtnClick);
 }
 
 function draw() {
@@ -68,6 +68,12 @@ function mouseReleased() {
 }
 
 function connectBtnClick() {
-  port.open("Arduino", 57600);
-  connectBtn.hide();
+  if (connectBtn.html() != "Disconnect") {
+    port.open("Arduino", 57600);
+    connectBtn.html("Disconnect");
+    //connectBtn.hide();
+  } else {
+    port.close();
+    connectBtn.html("Connect to Arduino");
+  }
 }

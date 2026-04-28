@@ -303,6 +303,7 @@
         { usbVendorId: 0x239a },                        // Adafruit
         { usbVendorId: 0x2a03 },                        // dog hunter AG
         { usbVendorId: 0x3343, usbProductId: 0x0043 },  // DFRobot UNO R3
+        { usbVendorId: 0x1A86, usbProductId: 0x7523 },  // CH340 serial converter, used on Sparkfun RedBoard and others
       ],
       'MicroPython': [                                  // from mu-editor as of 9/4/22
         { usbVendorId: 0x0403, usbProductId: 0x6001 },  // M5Stack & FT232/FT245 (XinaBox CW01, CW02)

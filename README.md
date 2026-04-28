@@ -39,13 +39,14 @@ function setup() {
   // ...
 ```
 
-To actually open a serial port, call the `open` method with the desired arguments. This prompts the user to select a serial port (at 9600 baud):
+To actually open a serial port, call the `open` method with the desired arguments. This shows a list of all serial ports and prompts the user which port to use (at 9600 baud):
 
 ```
 port.open(9600);
 ```
 
-This will only show Arduino boards (and compatible) in the dialog: (Other presets are `MicroPython`, `RaspberryPi`, `Adafruit`)
+To show only Arduino boards pass the `"Arduino"` argument. Other presets are `"MicroPython"`, `"RaspberryPi"`, and `"Adafruit"`. If your board is not auto-detected you can simply use the regular `open` call without a preset as above and have
+the user manually choose the port.
 
 ```
 port.open("Arduino", 9600);

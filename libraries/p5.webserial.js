@@ -83,7 +83,7 @@
       } else if ('usb' in navigator) {
         console.log('Using WebUSB polyfill for WebSerial');
       } else {
-       throw new Error('WebSerial is not supported in your browser (try Chrome or Edge)');
+       throw new Error('WebSerial is not supported in your browser (try Chrome, Edge or latest Firefox)');
       }
 
       if (p5inst instanceof p5) {                       // this ony argument might be a p5 instance

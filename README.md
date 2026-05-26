@@ -1,6 +1,6 @@
 # p5.webserial.js
 
-A library for p5.js which adds support for interacting with Serial devices, using the Web Serial API (currently supported on Chrome and Edge). It provides the following features:
+A library for p5.js which adds support for interacting with Serial devices, using the Web Serial API (currently supported on Chrome, Edge, and latest [Firefox](https://hacks.mozilla.org/2026/05/web-serial-support-in-firefox/)). It provides the following features:
 
 * Easy to use API, largely the same as Processing's [Serial library](https://processing.org/reference/libraries/serial/index.html)
 * No `async/await` or callbacks needed in sketches

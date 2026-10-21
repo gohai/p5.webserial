@@ -1,6 +1,6 @@
 /**
  * p5.webserial
- * (c) Gottfried Haider 2021-2023
+ * (c) Gottfried Haider 2021-2026
  * LGPL
  * https://github.com/gohai/p5.webserial
  * Based on documentation: https://web.dev/serial/
@@ -48,7 +48,7 @@
    * which can be used without additional user interaction.
    * This is useful for automatically connecting to serial devices
    * on page load. Pass one of the SerialPort objects this function
-   * returns to WebSerial() to do so.
+   * returns to open() to do so.
    * @method usedSerialPorts
    * @return {Array of SerialPort}
    */
@@ -61,11 +61,11 @@
    * Create a and return a WebSerial instance.
    */
   p5.prototype.createSerial = function() {
-    return new p5.prototype.WebSerial(this);
-  }
+    return new WebSerial(this);
+  };
 
 
-  p5.prototype.WebSerial = class {
+  const WebSerial = class {
 
     constructor(p5inst) {
       this.options     = { baudRate: 9600 };            // for port.open()

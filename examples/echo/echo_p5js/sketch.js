@@ -28,9 +28,9 @@ function draw() {
 
   // reads in complete lines and prints them at the
   // bottom of the canvas
-  let str = port.readUntil("\n");
-  if (str.length > 0) {
-    text(str, 10, height - 20);
+  let s = port.readUntil("\n");
+  if (s.length > 0) {
+    text(s, 10, height - 20);
   }
 }
 

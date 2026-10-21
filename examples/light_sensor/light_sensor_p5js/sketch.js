@@ -24,19 +24,19 @@ function setup() {
 function draw() {
   background(map(bright, minBright, maxBright, 0, 255));
 
-  let str = port.readUntil("\n");
-  if (str.length > 0) {
-    str = str.trim();
-    bright = parseInt(str);
+  let s = port.readUntil("\n");
+  if (s.length > 0) {
+    s = s.trim();
+    bright = parseInt(s);
     console.log(bright);
-  }
 
-  // this keeps track of the brightest and dimmest we saw
-  if (bright > maxBright) {
-    maxBright = bright;
-  }
-  if (bright < minBright) {
-    minBright = bright;
+    // this keeps track of the brightest and dimmest we saw
+    if (bright > maxBright) {
+      maxBright = bright;
+    }
+    if (bright < minBright) {
+      minBright = bright;
+    }
   }
 }
 
